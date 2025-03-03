@@ -32,12 +32,21 @@ namespace Karolin_CV_Fullstack
             app.UseAuthorization();
 
             // CREATE TECH SKILLS
-            app.MapPost("/Tech-skills", async ([FromBody] Tech_skills techSkill, CV_DbContext db) =>
+            app.MapPost("/Tech-skills", async (Tech_skills techSkill, CV_DbContext db) =>
             {
-                db.TechSkills.Add(techSkill);
-                await db.SaveChangesAsync();
-                return Results.Ok(techSkill);
+                try
+                {
+                    db.TechSkills.Add(techSkill);
+                    await db.SaveChangesAsync();
+                    return Results.Ok(techSkill);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Fel vid databasuppdatering: {ex.Message}");
+                    return Results.Problem("Kunde inte spara till databasen.");
+                }
             });
+
 
             // GET ALL TECH SKILLS
             app.MapGet("/Tech-skills", async (CV_DbContext db) =>
@@ -103,7 +112,7 @@ namespace Karolin_CV_Fullstack
             });
 
             // GET ALL PROJECTS
-            app.MapGet("/projects", async (CV_DbContext db) =>
+            app.MapGet("/Projects", async (CV_DbContext db) =>
             {
                 var projects = await db.Projects.ToListAsync();  
                 return Results.Ok(projects);
